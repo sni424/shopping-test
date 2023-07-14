@@ -6,6 +6,7 @@ import * as S from './styles';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import axios from 'axios';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface SubmitData {
     email: string;
@@ -19,9 +20,10 @@ const Signup = () => {
     const { register, handleSubmit, formState, reset, setError } = useForm({
         mode: 'onChange',
     });
-    console.log(formState.errors);
+    const router = useRouter();
 
     const onSubmit = (data: SubmitData) => {
+        const { email, name, password, phoneNumber } = data;
         if (data.password !== data.passwordConfirm) {
             setError(
                 'passwordConfirm',
@@ -31,7 +33,25 @@ const Signup = () => {
                 { shouldFocus: true }
             );
         } else {
-            axios.post('/user', {});
+            axios({
+                method: 'post',
+                url: 'http://192.168.88.234:4000/v1/api/user',
+                data: {
+                    uid: name,
+                    password: password,
+                    phone_number: phoneNumber,
+                    email: email,
+                },
+            })
+                .then(() => {
+                    window.alert('로그인이 완료되었습니다.');
+                    router.push('/login');
+                })
+                .catch((err) => {
+                    console.log(err.message);
+                });
+
+            reset();
         }
     };
     const userEmail = {

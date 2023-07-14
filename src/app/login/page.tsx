@@ -6,6 +6,7 @@ import * as S from './styles';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import axios from 'axios';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface SubmitData {
     email: string;
@@ -16,13 +17,37 @@ const Login = () => {
     const { register, handleSubmit, formState, reset, setError } = useForm({
         mode: 'onChange',
     });
-    console.log(formState.errors);
+    const route = useRouter();
 
     const onSubmit = (data: SubmitData) => {
-        axios.post('/user', {});
+        const token = window.localStorage.getItem('accessToken');
+        console.log(token);
+        axios({
+            method: 'POST',
+            url: 'http://192.168.88.234:4000/v1/api/user/signin',
+            data: {
+                email: data.email,
+                password: data.password,
+            },
+        })
+            .then((res) => {
+                window.localStorage.setItem(
+                    'accessToken',
+                    res.data.payload.token
+                );
+                window.localStorage.setItem(
+                    'refreshToken',
+                    res.data.payload.refreshToken
+                );
+                window.alert('로그인이 성공하였습니다.');
+                route.push('/');
+            })
+            .catch((err) => {
+                console.log(err.message);
+            });
     };
     const userEmail = {
-        required: '이메일을 적어주세요',
+        required: '닉네임을 적어주세요',
     };
 
     const userPassword = {

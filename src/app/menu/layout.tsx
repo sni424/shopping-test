@@ -1,5 +1,5 @@
 import React from 'react';
-import MainMenu from '../component/common/mainMenu/pages';
+import MainMenu from '../component/layout/mainMenu/pages';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     return (

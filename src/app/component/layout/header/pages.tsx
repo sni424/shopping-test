@@ -1,13 +1,22 @@
-'useClient';
+'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AiOutlineUser, AiOutlineHeart } from 'react-icons/ai';
-import { BiShoppingBag } from 'react-icons/bi';
+import { BiShoppingBag, BiSolidUser } from 'react-icons/bi';
 
 import * as S from './styles';
 
 const Header = () => {
+    const [user, setUser] = useState(false);
+
+    useEffect(() => {
+        if (localStorage.getItem('accessToken')) {
+            setUser(true);
+        } else {
+            setUser(false);
+        }
+    }, [user]);
     return (
         <S.HeaderDiv>
             <S.BrandName>
@@ -34,9 +43,15 @@ const Header = () => {
                 </S.HeaderMenu>
                 <S.IconUl>
                     <S.Li>
-                        <Link href="/login" style={{ color: 'black' }}>
-                            <AiOutlineUser />
-                        </Link>
+                        {user ? (
+                            <Link href="/user" style={{ color: 'black' }}>
+                                <BiSolidUser />
+                            </Link>
+                        ) : (
+                            <Link href="/login" style={{ color: 'black' }}>
+                                <AiOutlineUser />
+                            </Link>
+                        )}
                     </S.Li>
                     <S.Li>
                         <AiOutlineHeart />

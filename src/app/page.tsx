@@ -1,7 +1,9 @@
 import React from 'react';
-import MainMenu from './component/common/mainMenu/pages';
+import MainMenu from './component/layout/mainMenu/pages';
 import SelectHeader from './component/SelectHeader';
-import { HeaderProps } from '@/shopping-test/types/mainHeader';
+import { HeaderProps } from '@/types/mainHeader';
+import ItemBlock from './component/common/ItemBlock/ItemBlock';
+import HomeItem from './component/HomeItem';
 
 export default function Home() {
     const headerProps: HeaderProps = {
@@ -14,7 +16,10 @@ export default function Home() {
     return (
         <div style={{ display: 'flex' }}>
             <MainMenu />
-            <SelectHeader {...headerProps} />
+            <div style={{ width: '100%' }}>
+                <SelectHeader {...headerProps} />
+                <HomeItem />
+            </div>
         </div>
     );
 }

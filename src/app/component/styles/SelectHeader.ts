@@ -1,10 +1,11 @@
-'use client';
-
 import styled from 'styled-components';
+
+interface StyledButtonProps {
+    isSelected: boolean;
+}
 
 export const MainHome = styled.div`
     margin-top: 1.5rem;
-    height: 100%;
     width: 100%;
     display: flex;
 `;
@@ -17,7 +18,7 @@ export const PageName = styled.span`
 
 export const MenuBar = styled.div`
     display: flex;
-    align-items: center;
+    align-items: start;
     justify-content: space-between;
     width: 100%;
 `;
@@ -30,13 +31,18 @@ export const GenderSelect = styled.ul`
         margin-left: 2rem;
         padding: 0.7rem 3rem;
         border-radius: 2rem;
-        background-color: #f5f5f5;
         &:hover {
             cursor: pointer;
             background-color: #456aea;
             color: white;
         }
     }
+`;
+
+export const SelectLi = styled.li<StyledButtonProps>`
+    background-color: ${({ isSelected }) =>
+        isSelected ? '#456aea' : '#f5f5f5'};
+    color: ${({ isSelected }) => (isSelected ? 'white' : 'black')};
 `;
 
 export const IconUl = styled.ul`

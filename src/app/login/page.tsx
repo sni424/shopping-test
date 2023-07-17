@@ -20,8 +20,6 @@ const Login = () => {
     const route = useRouter();
 
     const onSubmit = (data: SubmitData) => {
-        const token = window.localStorage.getItem('accessToken');
-        console.log(token);
         axios({
             method: 'POST',
             url: 'http://192.168.88.234:4000/v1/api/user/signin',
@@ -43,7 +41,7 @@ const Login = () => {
                 route.push('/');
             })
             .catch((err) => {
-                console.log(err.message);
+                console.log(err.response.data.message);
             });
     };
     const userEmail = {

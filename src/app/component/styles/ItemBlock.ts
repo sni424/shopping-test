@@ -2,6 +2,10 @@
 
 import styled from 'styled-components';
 
+type HeartProps = {
+    isTrue: boolean;
+};
+
 export const BoxDiv = styled.div`
     width: 300px;
     height: 320px;
@@ -16,6 +20,8 @@ export const BoxDiv = styled.div`
 export const MarginDiv = styled.div`
     width: 90%;
     height: 90%;
+    margin: 0 auto;
+    position: relative;
 `;
 export const TopInfo = styled.div`
     display: flex;
@@ -32,8 +38,8 @@ export const Discount = styled.span`
     border-radius: 5px;
 `;
 
-export const Heart = styled.span`
-    color: white;
+export const Heart = styled.span<HeartProps>`
+    color: ${({ isTrue }) => (isTrue ? 'red' : 'white')};
     font-size: 30px;
     font-weight: 800;
     cursor: pointer;
@@ -65,4 +71,25 @@ export const Price = styled.ul`
         list-style: none;
         font-weight: 800;
     }
+`;
+
+export const AbsolDiv = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 2.1rem;
+`;
+
+export const Cicle = styled.div`
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background-color: #f5f5f5;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
 `;

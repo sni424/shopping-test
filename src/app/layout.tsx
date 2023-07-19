@@ -1,8 +1,11 @@
+'use client';
+
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Header from './component/layout/header/pages';
 import StyledComponentsRegistry from './lib/registry';
+import { RecoilRoot } from 'recoil';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,10 +23,12 @@ export default function RootLayout({
         <html lang="en">
             <link rel="icon" href="/umLogo.png" />
             <body className={inter.className}>
-                <StyledComponentsRegistry>
-                    <Header />
-                    {children}
-                </StyledComponentsRegistry>
+                <RecoilRoot>
+                    <StyledComponentsRegistry>
+                        <Header />
+                        {children}
+                    </StyledComponentsRegistry>
+                </RecoilRoot>
             </body>
         </html>
     );

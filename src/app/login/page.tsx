@@ -7,6 +7,10 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { userInfo } from '@/atoms';
+import * as decode from 'jose';
+import { userType } from '@/types/recoilType';
 
 interface SubmitData {
     email: string;
@@ -14,6 +18,8 @@ interface SubmitData {
 }
 
 const Login = () => {
+    const setUser = useSetRecoilState(userInfo);
+
     const { register, handleSubmit, formState, reset, setError } = useForm({
         mode: 'onChange',
     });
@@ -29,6 +35,7 @@ const Login = () => {
             },
         })
             .then((res) => {
+                console.log(res);
                 window.localStorage.setItem(
                     'accessToken',
                     res.data.payload.token
@@ -37,6 +44,14 @@ const Login = () => {
                     'refreshToken',
                     res.data.payload.refreshToken
                 );
+                try {
+                    const decodedToken = decode.decodeJwt(
+                        res.data.payload.token
+                    );
+                    setUser(decodedToken);
+                } catch (error: any) {
+                    console.error('JWT 토큰 디코딩 에러:', error.message);
+                }
                 window.alert('로그인이 성공하였습니다.');
                 route.push('/');
             })

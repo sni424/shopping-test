@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { BsSearch, BsSliders2 } from 'react-icons/bs';
 
 import * as S from './styles/SelectHeader';
@@ -10,15 +10,18 @@ interface Iprops {
     firstSearch?: string;
     secondSearch?: string;
     thirdSearch?: string;
+    setDataValue: Dispatch<SetStateAction<string>>;
 }
 
 const SelectHeader = (props: Iprops) => {
-    const { title, firstSearch, secondSearch, thirdSearch } = props;
+    const { title, firstSearch, secondSearch, thirdSearch, setDataValue } =
+        props;
 
     const [mainValue, setMainValue] = useState(firstSearch);
 
     const valueClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
         const clickedValue = e.currentTarget.id;
+        setDataValue(clickedValue);
         setMainValue(clickedValue);
     };
 

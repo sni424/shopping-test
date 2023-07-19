@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import MainMenu from './component/layout/mainMenu/pages';
 import SelectHeader from './component/SelectHeader';
 import { HeaderProps } from '@/types/mainHeader';
@@ -13,12 +15,14 @@ export default function Home() {
         thirdSearch: 'Women',
     };
 
+    const [dataValue, setDataValue] = useState<string>('All');
+
     return (
         <div style={{ display: 'flex' }}>
             <MainMenu />
             <div style={{ width: '100%' }}>
-                <SelectHeader {...headerProps} />
-                <HomeItem />
+                <SelectHeader {...headerProps} setDataValue={setDataValue} />
+                <HomeItem dataValue={dataValue} />
             </div>
         </div>
     );

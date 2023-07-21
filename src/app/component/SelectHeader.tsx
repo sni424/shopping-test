@@ -26,11 +26,11 @@ const SelectHeader = (props: Iprops) => {
     };
 
     return (
-        <>
-            <S.MainHome>
-                <S.PageName>{title}</S.PageName>
-                <S.MenuBar>
-                    <S.GenderSelect>
+        <S.MainHome>
+            <S.PageName>{title}</S.PageName>
+            <S.MenuBar>
+                <S.GenderSelect>
+                    <>
                         <S.SelectLi
                             isSelected={mainValue === firstSearch}
                             id={firstSearch}
@@ -52,18 +52,18 @@ const SelectHeader = (props: Iprops) => {
                         >
                             {thirdSearch}
                         </S.SelectLi>
-                    </S.GenderSelect>
-                    <S.IconUl>
-                        <li>
-                            <BsSearch />
-                        </li>
-                        <li>
-                            <BsSliders2 />
-                        </li>
-                    </S.IconUl>
-                </S.MenuBar>
-            </S.MainHome>
-        </>
+                    </>
+                </S.GenderSelect>
+                <S.IconUl>
+                    <li>
+                        <BsSearch />
+                    </li>
+                    <li>
+                        <BsSliders2 />
+                    </li>
+                </S.IconUl>
+            </S.MenuBar>
+        </S.MainHome>
     );
 };
 

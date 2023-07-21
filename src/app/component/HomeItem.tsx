@@ -44,11 +44,11 @@ const HomeItem = (props: HomeItemProps) => {
         (page - 1) * itemsPerPage,
         page * itemsPerPage
     );
-
     const handlePagination = (pageNumber: number) => {
         setPage(pageNumber); // 페이지 번호 변경
     };
     const userData = useRecoilValue(userInfo);
+
     useEffect(() => {
         axios({
             method: 'GET',
@@ -77,13 +77,12 @@ const HomeItem = (props: HomeItemProps) => {
                 console.log(err.response);
             });
         setPage(1);
-        console.log(itemData);
     }, [dataValue, refreshData]);
 
     return (
         <div>
             <S.HomeItemDiv>
-                {currentPageItems.map(
+                {currentPageItems?.map(
                     (data, index): React.ReactElement => (
                         <ItemBlock
                             key={index}

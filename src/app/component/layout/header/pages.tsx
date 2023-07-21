@@ -54,10 +54,14 @@ const Header = () => {
                         )}
                     </S.Li>
                     <S.Li>
-                        <AiOutlineHeart />
+                        <Link href="/product/heart" style={{ color: 'black' }}>
+                            <AiOutlineHeart />
+                        </Link>
                     </S.Li>
                     <S.Li>
-                        <BiShoppingBag />
+                        <Link href="/product/cart" style={{ color: 'black' }}>
+                            <BiShoppingBag />
+                        </Link>
                     </S.Li>
                 </S.IconUl>
             </S.FelxDiv>

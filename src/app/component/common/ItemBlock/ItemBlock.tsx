@@ -25,11 +25,11 @@ interface Iprops {
     name: string;
     price: string;
     productId: number;
-    heart: userType[];
+    heart?: userType[] | userType;
     userId?: number;
     setRefreshData: React.Dispatch<React.SetStateAction<boolean>>;
     page: number;
-    dataValue: string;
+    dataValue?: string;
 }
 
 type HeartProps = {
@@ -70,15 +70,58 @@ const ItemBlock = (props: Iprops) => {
             });
     };
 
+    const deletHeart = () => {
+        axios({
+            method: 'delete',
+            url: 'http://192.168.88.234:4000/v1/api/heart/product/' + productId,
+            data: {
+                user_id: userId,
+            },
+        })
+            .then((res) => {
+                window.alert('좋아요 취소');
+                setRefreshData((prev) => !prev);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const inputCart = () => {
+        axios({
+            method: 'post',
+            url: 'http://192.168.88.234:4000/v1/api/cart',
+            data: {
+                user_id: userId,
+                product_id: productId,
+                amount: 1,
+            },
+        })
+            .then((res) => {
+                window.alert('장바구니로 이동');
+                setRefreshData((prev) => !prev);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     useEffect(() => {
-        if (heart.length >= 1) {
-            heart.forEach((data: any) => {
+        if (Array.isArray(heart) && heart.length >= 1) {
+            heart?.forEach((data: any) => {
                 if (data.id === userId) {
                     setHeartTrue(true);
                 }
             });
+        } else if (heart && typeof heart === 'object') {
+            if (heart?.id === userId) {
+                setHeartTrue(true);
+            } else {
+                setHeartTrue(false);
+            }
         } else {
             setHeartTrue(false);
+            console.log('완성3');
         }
     }, [heart, page, dataValue]);
 
@@ -89,7 +132,7 @@ const ItemBlock = (props: Iprops) => {
                     <S.Discount>{stock}%</S.Discount>
                     <S.Heart isTrue={heartTrue}>
                         {heartTrue ? (
-                            <AiFillHeart />
+                            <AiFillHeart onClick={deletHeart} />
                         ) : (
                             <AiOutlineHeart onClick={postHeart} />
                         )}
@@ -114,7 +157,7 @@ const ItemBlock = (props: Iprops) => {
                     <li>₩{price}</li>
                 </S.Price>
                 <S.AbsolDiv>
-                    <S.Cicle>
+                    <S.Cicle onClick={inputCart}>
                         <BiShoppingBag />
                     </S.Cicle>
                 </S.AbsolDiv>

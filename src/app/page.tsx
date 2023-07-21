@@ -19,6 +19,7 @@ export default function Home() {
 
     return (
         <div style={{ display: 'flex' }}>
+            <title>어글리뮤즈</title>
             <MainMenu />
             <div style={{ width: '100%' }}>
                 <SelectHeader {...headerProps} setDataValue={setDataValue} />

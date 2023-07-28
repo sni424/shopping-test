@@ -5,10 +5,11 @@ import React, { useEffect, useState } from 'react';
 import * as S from '../styles/heart';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
-import { userInfo } from '@/atoms';
+
 import ItemBlock from '../../component/common/ItemBlock/ItemBlock';
 import { userType } from '@/types/recoilType';
 import Pagination from '../../component/common/Pagination/Pagination';
+import { defaultUrl } from '@/utils/axios';
 
 interface Iimage {
     created_at: string;
@@ -31,7 +32,6 @@ interface Iprops {
 }
 
 const Heart = () => {
-    const userData = useRecoilValue(userInfo);
     const [heartData, setHeartData] = useState<Iprops[]>([]);
     const [refreshData, setRefreshData] = useState(false);
     const [dataLength, setDataLength] = useState(false);
@@ -46,11 +46,15 @@ const Heart = () => {
         setPage(pageNumber); // 페이지 번호 변경
     };
 
+    console.log(currentPageItems);
+
     useEffect(() => {
-        console.log('확인');
         axios({
             method: 'get',
-            url: 'http://192.168.88.234:4000/v1/api/heart/user/' + userData.id,
+            url: `${defaultUrl}/heart/me`,
+            headers: {
+                Authorization: `Bearer ${window.localStorage.accessToken}`,
+            },
         })
             .then((res) => {
                 setHeartData(res.data.payload);
@@ -79,7 +83,7 @@ const Heart = () => {
                                 price={data.product.price}
                                 productId={data.product_id}
                                 userId={data.user_id}
-                                heart={data.user}
+                                heart={true}
                                 setRefreshData={setRefreshData}
                                 page={page}
                             />

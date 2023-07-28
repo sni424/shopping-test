@@ -1,5 +1,4 @@
 'use client';
-import { userInfo } from '@/atoms';
 import * as S from '../styles/cart';
 
 import Image from 'next/image';
@@ -8,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userType } from '@/types/recoilType';
 import Pagination from '../../component/common/Pagination/Pagination';
+import { defaultUrl } from '@/utils/axios';
 
 interface Iimage {
     created_at: string;
@@ -30,7 +30,6 @@ interface Iprops {
 }
 
 const Cart = () => {
-    const userData = useRecoilValue(userInfo);
     const [cartData, setCartData] = useState<Iprops[]>([]);
     const [newSet, setNewSet] = useState(false);
 
@@ -43,14 +42,15 @@ const Cart = () => {
     const handlePagination = (pageNumber: number) => {
         setPage(pageNumber); // 페이지 번호 변경
     };
-    console.log(cartData);
     const Cancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         const itemId = e.currentTarget.id;
         axios({
             method: 'post',
-            url: 'http://192.168.88.234:4000/v1/api/cart',
+            url: `${defaultUrl}/cart`,
+            headers: {
+                Authorization: `Bearer ${window.localStorage.accessToken}`,
+            },
             data: {
-                user_id: userData.id,
                 product_id: itemId,
                 amount: -1,
             },
@@ -66,8 +66,11 @@ const Cart = () => {
     const Delete = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         const itemId = e.currentTarget.id;
         axios({
-            method: 'post',
-            url: 'http://192.168.88.234:4000/v1/api/cart/' + itemId,
+            method: 'delete',
+            url: `${defaultUrl}/cart/` + itemId,
+            headers: {
+                Authorization: `Bearer ${window.localStorage.accessToken}`,
+            },
         })
             .then((res) => {
                 window.alert('삭제완료');
@@ -77,10 +80,14 @@ const Cart = () => {
                 console.log(err);
             });
     };
+    console.log(currentPageItems);
     useEffect(() => {
         axios({
             method: 'get',
-            url: 'http://192.168.88.234:4000/v1/api/cart/user/' + userData.id,
+            url: `${defaultUrl}/cart/me`,
+            headers: {
+                Authorization: `Bearer ${window.localStorage.accessToken}`,
+            },
         })
             .then((res) => {
                 setCartData(res.data.payload);
@@ -90,17 +97,34 @@ const Cart = () => {
             });
     }, [newSet]);
 
+    const changeCheck = (e: any) => {
+        console.log(e.target.value);
+    };
+
     return (
         <div style={{ width: '100%' }}>
             <title>장바구니</title>
             <S.PageName>Cart</S.PageName>
             <S.CartDiv>
                 {currentPageItems?.map((data: any) => {
+                    const discountPercent = data.product?.discounts[0]?.percent;
+                    console.log(discountPercent);
+                    const discountedPrice = discountPercent
+                        ? Number(data.product?.price) *
+                          ((100 - Number(discountPercent)) / 10) *
+                          data?.amount
+                        : data.product?.price * Number(data?.amount);
+
                     return (
                         <S.CartBox key={data.id}>
+                            <input
+                                type="checkbox"
+                                value={data.id}
+                                onChange={(e) => changeCheck(e)}
+                            />
                             <S.Image>
                                 <Image
-                                    src="/umLogo.png"
+                                    src={data?.product?.images[0]?.path}
                                     alt="상품이미지"
                                     width={100}
                                     height={100}
@@ -113,12 +137,20 @@ const Cart = () => {
                                     <S.Category>
                                         카테고리: {data.product.category.name}
                                     </S.Category>
-                                    <S.Stock>
-                                        할인: {data.product.stock}%
-                                    </S.Stock>
-                                    <S.Price>
-                                        가격: {data.product.price}
-                                    </S.Price>
+                                    {data.product?.discounts[0]?.percent ? (
+                                        <S.Stock>
+                                            할인:{' '}
+                                            {
+                                                data.product?.discounts[0]
+                                                    ?.percent
+                                            }
+                                            %
+                                        </S.Stock>
+                                    ) : (
+                                        <></>
+                                    )}
+
+                                    <S.Price>가격: {discountedPrice}</S.Price>
                                     <S.Count>수량: {data.amount}</S.Count>
                                 </div>
                             </S.InfoDiv>

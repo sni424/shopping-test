@@ -22,6 +22,7 @@ export const BrandName = styled.span`
 `;
 
 export const FelxDiv = styled.div`
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -49,12 +50,21 @@ export const IconUl = styled.ul`
     text-align: none;
 `;
 
-export const Li = styled.div`
+export const Li = styled.li`
     list-style: none;
     margin-left: 15px;
     &:hover {
         cursor: pointer;
         color: black;
         font-weight: 800;
+    }
+`;
+export const IconLi = styled.li`
+    list-style: none;
+    margin-left: 15px;
+`;
+export const HoverDiv = styled.div`
+    &:hover {
+        cursor: pointer;
     }
 `;

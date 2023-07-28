@@ -2,13 +2,22 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { AiOutlineUser, AiOutlineHeart } from 'react-icons/ai';
 import { BiShoppingBag, BiSolidUser } from 'react-icons/bi';
 
 import * as S from './styles';
+import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
+import LoginPopup from '../../popup/LoginPopup';
+import { reStart } from '@/atoms';
 
 const Header = () => {
     const [user, setUser] = useState(false);
+    const [popUp, setPopUp] = useState(false);
+    const reLoadBool = useRecoilValue(reStart);
+    const popupToggle = () => {
+        setPopUp((pre) => !pre);
+    };
 
     useEffect(() => {
         if (localStorage.getItem('accessToken')) {
@@ -16,7 +25,7 @@ const Header = () => {
         } else {
             setUser(false);
         }
-    }, [user]);
+    }, [reLoadBool]);
     return (
         <S.HeaderDiv>
             <S.BrandName>
@@ -42,17 +51,26 @@ const Header = () => {
                     </Link>
                 </S.HeaderMenu>
                 <S.IconUl>
-                    <S.Li>
+                    <S.IconLi>
                         {user ? (
-                            <Link href="/user" style={{ color: 'black' }}>
+                            // <Link href="/user" style={{ color: 'black' }}>
+                            <S.HoverDiv onClick={popupToggle}>
                                 <BiSolidUser />
-                            </Link>
+                            </S.HoverDiv>
                         ) : (
+                            // </Link>
                             <Link href="/login" style={{ color: 'black' }}>
-                                <AiOutlineUser />
+                                <S.HoverDiv>
+                                    <AiOutlineUser />
+                                </S.HoverDiv>
                             </Link>
                         )}
-                    </S.Li>
+                        {popUp ? (
+                            <LoginPopup setUser={setUser} setPopUp={setPopUp} />
+                        ) : (
+                            ''
+                        )}
+                    </S.IconLi>
                     <S.Li>
                         <Link href="/product/heart" style={{ color: 'black' }}>
                             <AiOutlineHeart />

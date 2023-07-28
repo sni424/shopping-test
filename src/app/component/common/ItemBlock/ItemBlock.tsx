@@ -7,6 +7,7 @@ import { BiShoppingBag } from 'react-icons/bi';
 import Image from 'next/image';
 import axios from 'axios';
 import { userType } from '@/types/recoilType';
+import { defaultUrl } from '@/utils/axios';
 
 interface Iimage {
     created_at: string;
@@ -25,7 +26,7 @@ interface Iprops {
     name: string;
     price: string;
     productId: number;
-    heart?: userType[] | userType;
+    heart: boolean;
     userId?: number;
     setRefreshData: React.Dispatch<React.SetStateAction<boolean>>;
     page: number;
@@ -53,29 +54,38 @@ const ItemBlock = (props: Iprops) => {
     const [heartTrue, setHeartTrue] = useState(false);
 
     const postHeart = () => {
-        axios({
-            method: 'post',
-            url: 'http://192.168.88.234:4000/v1/api/heart',
-            data: {
-                user_id: userId,
-                product_id: productId,
-            },
-        })
-            .then((res) => {
-                window.alert('좋아요 성공');
-                setRefreshData((prev) => !prev);
+        if (window.localStorage.accessToken) {
+            axios({
+                method: 'POST',
+                url: `${defaultUrl}/heart`,
+                headers: {
+                    authorization: `Bearer ${window.localStorage.accessToken}`,
+                },
+                data: {
+                    product_id: productId,
+                },
             })
-            .catch((err) => {
-                console.log(err);
-            });
+                .then((res) => {
+                    window.alert('좋아요 성공');
+                    setRefreshData((prev) => !prev);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            window.alert('해당기능은 로그인해야 사용이 가능합니다.');
+        }
     };
 
     const deletHeart = () => {
         axios({
             method: 'delete',
-            url: 'http://192.168.88.234:4000/v1/api/heart/product/' + productId,
+            url: `${defaultUrl}/heart/revert/` + productId,
+            headers: {
+                authorization: `Bearer ${window.localStorage.accessToken}`,
+            },
             data: {
-                user_id: userId,
+                product_id: productId,
             },
         })
             .then((res) => {
@@ -90,9 +100,11 @@ const ItemBlock = (props: Iprops) => {
     const inputCart = () => {
         axios({
             method: 'post',
-            url: 'http://192.168.88.234:4000/v1/api/cart',
+            url: `${defaultUrl}/cart`,
+            headers: {
+                authorization: `Bearer ${window.localStorage.accessToken}`,
+            },
             data: {
-                user_id: userId,
                 product_id: productId,
                 amount: 1,
             },
@@ -106,32 +118,13 @@ const ItemBlock = (props: Iprops) => {
             });
     };
 
-    useEffect(() => {
-        if (Array.isArray(heart) && heart.length >= 1) {
-            heart?.forEach((data: any) => {
-                if (data.id === userId) {
-                    setHeartTrue(true);
-                }
-            });
-        } else if (heart && typeof heart === 'object') {
-            if (heart?.id === userId) {
-                setHeartTrue(true);
-            } else {
-                setHeartTrue(false);
-            }
-        } else {
-            setHeartTrue(false);
-            console.log('완성3');
-        }
-    }, [heart, page, dataValue]);
-
     return (
         <S.BoxDiv>
             <S.MarginDiv>
                 <S.TopInfo>
                     <S.Discount>{stock}%</S.Discount>
-                    <S.Heart isTrue={heartTrue}>
-                        {heartTrue ? (
+                    <S.Heart isTrue={heart}>
+                        {heart ? (
                             <AiFillHeart onClick={deletHeart} />
                         ) : (
                             <AiOutlineHeart onClick={postHeart} />

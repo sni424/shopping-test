@@ -21,7 +21,7 @@ const SelectHeader = (props: Iprops) => {
 
     const valueClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
         const clickedValue = e.currentTarget.id;
-        setDataValue(clickedValue);
+        setDataValue(() => clickedValue);
         setMainValue(clickedValue);
     };
 

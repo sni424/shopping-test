@@ -1,13 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
 import ItemBlock from './common/ItemBlock/ItemBlock';
 import * as S from './styles/HomeItem';
 import Pagination from './common/Pagination/Pagination';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
-import { userInfo } from '@/atoms';
+import { reStart } from '@/atoms';
 import { userType } from '@/types/recoilType';
+import { defaultUrl, reFresh } from '@/utils/axios';
 
 interface Iimage {
     created_at: string;
@@ -26,19 +29,35 @@ interface Iprops {
     name: string;
     price: string;
     id: number;
-    hearts: userType[];
+    hearts: boolean;
 }
 
 interface HomeItemProps {
     dataValue: string;
 }
 
+interface Idict {
+    Men: string;
+    Women: string;
+    All: string;
+}
+
+const dict = {
+    Men: '?category=G-1',
+    Women: '?category=G-2',
+    All: '',
+};
+
+type valueType = 'Men' | 'Women' | 'All';
+
 const HomeItem = (props: HomeItemProps) => {
     const { dataValue } = props;
+    const router = useRouter();
     const itemsPerPage = 8; // 한 페이지에 보여질 아이템 개수
     const [page, setPage] = useState(1); // 페이지 번호 상태 변수
     const [itemData, setItemData] = useState<Iprops[]>([]);
     const [refreshData, setRefreshData] = useState(false);
+    const reLoadBool = useRecoilValue(reStart);
 
     const currentPageItems = itemData.slice(
         (page - 1) * itemsPerPage,
@@ -47,37 +66,44 @@ const HomeItem = (props: HomeItemProps) => {
     const handlePagination = (pageNumber: number) => {
         setPage(pageNumber); // 페이지 번호 변경
     };
-    const userData = useRecoilValue(userInfo);
 
-    useEffect(() => {
+    const getProduct = (header: any) => {
         axios({
             method: 'GET',
-            url: 'http://192.168.88.234:4000/v1/api/product ',
+            url:
+                `${defaultUrl}/product/` +
+                `${(dict as Idict)[dataValue as valueType]}`,
+            headers: header,
         })
             .then((res) => {
-                switch (dataValue) {
-                    case 'Men':
-                        const MenData = res.data.payload.filter(
-                            (data: any) => data.category_code === 'G-1'
-                        );
-                        setItemData([...MenData]);
-                        break;
-                    case 'Women':
-                        const WomenData = res.data.payload.filter(
-                            (data: any) => data.category_code === 'G-2'
-                        );
-                        setItemData([...WomenData]);
-                        break;
-                    default:
-                        setItemData([...res.data.payload]);
-                        break;
-                }
+                setItemData([...res.data.payload]);
             })
-            .catch((err) => {
+            .catch(async (err) => {
+                if (err.response.data.detail === 'token has expired') {
+                    await reFresh()
+                        .then((res) => {
+                            setRefreshData((pre) => !pre);
+                        })
+                        .catch((err) => {
+                            router.push('/');
+                        });
+                }
                 console.log(err.response);
             });
+    };
+
+    useEffect(() => {
+        console.log('안녕');
+        if (window.localStorage.accessToken) {
+            const header = {
+                Authorization: `Bearer ${window.localStorage.accessToken}`,
+            };
+            getProduct(header);
+        } else {
+            getProduct({ Authorization: '' });
+        }
         setPage(1);
-    }, [dataValue, refreshData]);
+    }, [dataValue, refreshData, reLoadBool]);
 
     return (
         <div>
@@ -92,7 +118,6 @@ const HomeItem = (props: HomeItemProps) => {
                             price={data.price}
                             productId={data.id}
                             heart={data.hearts}
-                            userId={userData.id}
                             setRefreshData={setRefreshData}
                             page={page}
                             dataValue={dataValue}

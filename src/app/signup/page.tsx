@@ -7,6 +7,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { defaultUrl } from '@/utils/axios';
 
 interface SubmitData {
     email: string;
@@ -35,7 +36,7 @@ const Signup = () => {
         } else {
             axios({
                 method: 'post',
-                url: 'http://192.168.88.234:4000/v1/api/user',
+                url: `${defaultUrl}/user`,
                 data: {
                     uid: name,
                     password: password,

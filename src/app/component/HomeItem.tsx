@@ -22,6 +22,16 @@ interface Iimage {
     type: string;
     updated_at: string;
 }
+interface Idiscounts {
+    content: string;
+    created_at: string;
+    id: number;
+    is_active: boolean;
+    name: string;
+    percent: number;
+    product_id: number;
+    updated_at: string;
+}
 
 interface Iprops {
     stock: string;
@@ -30,6 +40,8 @@ interface Iprops {
     price: string;
     id: number;
     hearts: boolean;
+    discount_cost: number;
+    discounts: Idiscounts[];
 }
 
 interface HomeItemProps {
@@ -93,7 +105,6 @@ const HomeItem = (props: HomeItemProps) => {
     };
 
     useEffect(() => {
-        console.log('안녕');
         if (window.localStorage.accessToken) {
             const header = {
                 Authorization: `Bearer ${window.localStorage.accessToken}`,
@@ -121,6 +132,8 @@ const HomeItem = (props: HomeItemProps) => {
                             setRefreshData={setRefreshData}
                             page={page}
                             dataValue={dataValue}
+                            discountCost={data.discount_cost}
+                            discounts={data.discounts[0]}
                         />
                     )
                 )}

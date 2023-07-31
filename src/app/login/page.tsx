@@ -10,19 +10,17 @@ import { useRouter } from 'next/navigation';
 import * as decode from 'jose';
 import { userType } from '@/types/recoilType';
 import { defaultUrl } from '@/utils/axios';
-
-interface SubmitData {
-    email: string;
-    password: string;
-}
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { reStart } from '@/atoms';
 
 const Login = () => {
     const { register, handleSubmit, formState, reset, setError } = useForm({
         mode: 'onChange',
     });
     const route = useRouter();
+    const serUser = useSetRecoilState(reStart);
 
-    const onSubmit = (data: SubmitData) => {
+    const onSubmit = (data: any) => {
         axios({
             method: 'POST',
             url: `${defaultUrl}/user/signin`,
@@ -42,6 +40,7 @@ const Login = () => {
                     res.data.payload.refreshToken
                 );
                 window.alert('로그인이 성공하였습니다.');
+                serUser((pre: any) => !pre);
                 route.push('/');
             })
             .catch((err) => {

@@ -20,7 +20,7 @@ const Header = () => {
     };
 
     useEffect(() => {
-        if (localStorage.getItem('accessToken')) {
+        if (window.localStorage.getItem('accessToken')) {
             setUser(true);
         } else {
             setUser(false);

@@ -9,14 +9,14 @@ import axios from 'axios';
 import { userType } from '@/types/recoilType';
 import { defaultUrl } from '@/utils/axios';
 
-interface Iimage {
+interface Idiscounts {
+    content: string;
     created_at: string;
     id: number;
-    path: string;
+    is_active: boolean;
+    name: string;
+    percent: number;
     product_id: number;
-    size: number;
-    title: string;
-    type: string;
     updated_at: string;
 }
 
@@ -31,6 +31,8 @@ interface Iprops {
     setRefreshData: React.Dispatch<React.SetStateAction<boolean>>;
     page: number;
     dataValue?: string;
+    discountCost: number;
+    discounts: Idiscounts;
 }
 
 type HeartProps = {
@@ -50,6 +52,8 @@ const ItemBlock = (props: Iprops) => {
         setRefreshData,
         page,
         dataValue,
+        discountCost,
+        discounts,
     } = props;
     const [heartTrue, setHeartTrue] = useState(false);
 
@@ -122,7 +126,12 @@ const ItemBlock = (props: Iprops) => {
         <S.BoxDiv>
             <S.MarginDiv>
                 <S.TopInfo>
-                    <S.Discount>{stock}%</S.Discount>
+                    {discounts ? (
+                        <S.Discount>{discounts.percent}%</S.Discount>
+                    ) : (
+                        <S.Discount>0%</S.Discount>
+                    )}
+
                     <S.Heart isTrue={heart}>
                         {heart ? (
                             <AiFillHeart onClick={deletHeart} />
@@ -147,7 +156,7 @@ const ItemBlock = (props: Iprops) => {
 
                 <S.GoodsName>{name}</S.GoodsName>
                 <S.Price>
-                    <li>₩{price}</li>
+                    <li>₩{discountCost ? discountCost : price}</li>
                 </S.Price>
                 <S.AbsolDiv>
                     <S.Cicle onClick={inputCart}>

@@ -46,8 +46,6 @@ const Heart = () => {
         setPage(pageNumber); // 페이지 번호 변경
     };
 
-    console.log(currentPageItems);
-
     useEffect(() => {
         axios({
             method: 'get',
@@ -65,7 +63,7 @@ const Heart = () => {
                 setDataLength(true);
             });
     }, [refreshData]);
-
+    console.log(currentPageItems);
     return (
         <div>
             <S.PageName>Heart</S.PageName>
@@ -86,6 +84,8 @@ const Heart = () => {
                                 heart={true}
                                 setRefreshData={setRefreshData}
                                 page={page}
+                                discountCost={data.discount_cost}
+                                discounts={data.product.discounts[0]}
                             />
                         )
                     )

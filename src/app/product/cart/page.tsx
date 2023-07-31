@@ -4,10 +4,11 @@ import * as S from '../styles/cart';
 import Image from 'next/image';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { userType } from '@/types/recoilType';
 import Pagination from '../../component/common/Pagination/Pagination';
 import { defaultUrl } from '@/utils/axios';
+import { reStart } from '@/atoms';
 
 interface Iimage {
     created_at: string;
@@ -32,9 +33,13 @@ interface Iprops {
 const Cart = () => {
     const [cartData, setCartData] = useState<Iprops[]>([]);
     const [newSet, setNewSet] = useState(false);
-
-    const itemsPerPage = 3;
     const [page, setPage] = useState(1);
+    const [tempC, setTempC] = useRecoilState(reStart);
+
+    let formData = new FormData();
+    let newFormData: any[] = [];
+    const itemsPerPage = 3;
+
     const currentPageItems = cartData.slice(
         (page - 1) * itemsPerPage,
         page * itemsPerPage
@@ -42,45 +47,43 @@ const Cart = () => {
     const handlePagination = (pageNumber: number) => {
         setPage(pageNumber); // 페이지 번호 변경
     };
-    const Cancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        const itemId = e.currentTarget.id;
+
+    const changeCheck = (e: any) => {
+        const cartId = e.target.value;
+        const isChecked = e.target.checked;
+
+        if (isChecked) {
+            // 체크박스가 선택되면 해당 카트 ID를 newFormData에 추가합니다.
+            newFormData.push(cartId);
+        } else {
+            // 체크박스가 선택 해제되면 해당 카트 ID를 newFormData에서 제외합니다.
+            newFormData = newFormData.filter((data) => data !== cartId);
+        }
+        formData.delete('cart_id');
+        newFormData.forEach((data) => {
+            formData.append('cart_id', data);
+        });
+    };
+
+    const buyStuff = (e: any) => {
         axios({
             method: 'post',
-            url: `${defaultUrl}/cart`,
+            url: `${defaultUrl}/order/select`,
             headers: {
                 Authorization: `Bearer ${window.localStorage.accessToken}`,
+                'Content-Type': 'multipart/form-data',
             },
-            data: {
-                product_id: itemId,
-                amount: -1,
-            },
+            data: formData,
         })
             .then((res) => {
-                setNewSet((pre) => !pre);
+                window.alert('구매완료');
+                setTempC((pre: any) => !pre);
             })
-            .catch((err) => {
-                console.log(err);
+            .catch((res) => {
+                console.log(res.response);
             });
     };
 
-    const Delete = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        const itemId = e.currentTarget.id;
-        axios({
-            method: 'delete',
-            url: `${defaultUrl}/cart/` + itemId,
-            headers: {
-                Authorization: `Bearer ${window.localStorage.accessToken}`,
-            },
-        })
-            .then((res) => {
-                window.alert('삭제완료');
-                setNewSet((pre) => !pre);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-    console.log(currentPageItems);
     useEffect(() => {
         axios({
             method: 'get',
@@ -95,11 +98,8 @@ const Cart = () => {
             .catch((err) => {
                 console.log(err);
             });
-    }, [newSet]);
-
-    const changeCheck = (e: any) => {
-        console.log(e.target.value);
-    };
+    }, [newSet, tempC]);
+    console.log(currentPageItems);
 
     return (
         <div style={{ width: '100%' }}>
@@ -108,7 +108,7 @@ const Cart = () => {
             <S.CartDiv>
                 {currentPageItems?.map((data: any) => {
                     const discountPercent = data.product?.discounts[0]?.percent;
-                    console.log(discountPercent);
+
                     const discountedPrice = discountPercent
                         ? Number(data.product?.price) *
                           ((100 - Number(discountPercent)) / 10) *
@@ -156,22 +156,18 @@ const Cart = () => {
                             </S.InfoDiv>
                             <S.BtnDiv>
                                 <S.CenterDiv>
-                                    <S.Btn
-                                        id={data.product_id}
-                                        onClick={Cancel}
-                                    >
-                                        취소
-                                    </S.Btn>
+                                    <S.Btn id={data.product_id}>취소</S.Btn>
                                 </S.CenterDiv>
                                 <S.CenterDiv>
-                                    <S.Btn id={data.id} onClick={Delete}>
-                                        삭제
-                                    </S.Btn>
+                                    <S.Btn id={data.id}>삭제</S.Btn>
                                 </S.CenterDiv>
                             </S.BtnDiv>
                         </S.CartBox>
                     );
                 })}
+
+                <button onClick={buyStuff}>상품 구매</button>
+
                 <Pagination
                     totalItems={cartData.length}
                     itemsPerPage={itemsPerPage}

@@ -97,7 +97,7 @@ const HomeItem = (props: HomeItemProps) => {
                             setRefreshData((pre) => !pre);
                         })
                         .catch((err) => {
-                            router.push('/');
+                            router.push('/login');
                         });
                 }
                 console.log(err.response);

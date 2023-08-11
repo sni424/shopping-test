@@ -2,12 +2,13 @@
 import * as S from '../styles/cart';
 
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { userType } from '@/types/recoilType';
 import Pagination from '../../component/common/Pagination/Pagination';
-import { defaultUrl } from '@/utils/axios';
+import { defaultUrl, reFresh } from '@/utils/axios';
 import { reStart } from '@/atoms';
 
 interface Iimage {
@@ -35,6 +36,7 @@ const Cart = () => {
     const [newSet, setNewSet] = useState(false);
     const [page, setPage] = useState(1);
     const [tempC, setTempC] = useRecoilState(reStart);
+    const router = useRouter();
 
     let formData = new FormData();
     let newFormData: any[] = [];
@@ -95,8 +97,17 @@ const Cart = () => {
             .then((res) => {
                 setCartData(res.data.payload);
             })
-            .catch((err) => {
-                console.log(err);
+            .catch(async (err) => {
+                if (err.response.data.detail === 'token has expired') {
+                    await reFresh()
+                        .then((res) => {
+                            setNewSet((pre) => !pre);
+                        })
+                        .catch((err) => {
+                            router.push('/login');
+                        });
+                }
+                console.log(err.response);
             });
     }, [newSet, tempC]);
     console.log(currentPageItems);
